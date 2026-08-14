@@ -10,6 +10,7 @@ import com.sist.web.vo.*;
 @Repository
 public interface FoodMapper {
 
+	// XMl mapper 파일 작성 => 해당 아이디 호출해서 쓰는 방식
 	/*
 	 *   <select id="foodListData" resultType="com.sist.web.FoodVO" parameterType="int">
 		   SELECT no,name,poster,address
@@ -21,6 +22,7 @@ public interface FoodMapper {
 	// 목록 출력
 	public List<FoodVO> foodListData(int start);
 	
+	// Annotation 기법
 	// 총페이지 = 간단하니까 이렇게 작성
 	@Select("SELECT CEIL(COUNT(*)/12.0) FROM food")
 	public int foodTotalPage();
