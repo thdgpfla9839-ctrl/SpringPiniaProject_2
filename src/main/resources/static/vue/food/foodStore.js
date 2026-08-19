@@ -34,7 +34,8 @@ const useFoodStore=defineStore('food_store',{
    // actions는 서버와 연동할 때 사용
    // 이 부분은 methods:{dataRecv()}가 이렇게 바뀌어서 작성
    actions:{
-	async foodListData(){
+	// async : 서버 응답을 기다려야 하는 함수라고 알려주기 위해 표기
+	async foodListData(){ 
 		const res=await api.get('/food/list_vue',{
 			params:{
 				page: this.curpage // 요청보내는 값
