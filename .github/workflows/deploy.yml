@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-# 작업 지시 
+# 작업 지시  
 jobs:
   deploy: 
     runs-on: self-hosted #현재 Ubuntu에 배포 
