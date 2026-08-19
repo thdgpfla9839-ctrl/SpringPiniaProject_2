@@ -5,7 +5,7 @@ on:
     branches:
       - main
 # 작업 지시  
-jobs:
+jobs: 
   deploy: 
     runs-on: self-hosted #현재 Ubuntu에 배포 
     #어떤 순서로 진행할지 
