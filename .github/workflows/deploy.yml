@@ -33,20 +33,16 @@ jobs:
       # 빌드 => test는 제외하고
       - run: ./gradlew clean build -x test
       # Docker 이미지 생성
-      - run: docker build -t food-app .
-      # 기존의 docker ps를 중지 / 삭제 
-      - run: |
-          docker stop food-app || true 
-          docker rm food-app || true
-      # 새로운 docker 실행 (컨테이너)
-      - run: |
-          docker run --name food-app -d --env-file .env -p 9090:9090 food-app
-      # 실행 => jar파일 생성 => java -jar app.jar => 일반 자바
-      #- run: |
-          #PID=$(lsof -t -i:8080 || true)
-          #if [ -n "$PID" ]; then
-          #   kill -15 "$PID" || true
-          #fi
-     #- run: nohup java -jar build/libs/SpringThymeLeafDockerProject-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+      - run: docker build -t pinia-app .
+     # Docker Hub 연결
+      - run: echo "${{secrets.DOCKER_PASSWORD}}" | docker login -u "${{secrets.DOCKER_USERNAME}}" --password-stdin 
+     # Docker hub push
+      - run: docker push pinia-app
+     # 기존의 컨테이너 종료
+      - run: docker compose down
+     # 최신 도커 실행
+      - run : docker compose pull
+    # 도커 컨테이너 실행
+      - run: docker compose up -d
         env:
          RUNNER_TRACKING_ID: ""
