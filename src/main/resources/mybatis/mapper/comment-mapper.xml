@@ -3,7 +3,7 @@
 <mapper namespace="com.sist.web.mapper.CommentMapper">
 
 <!--  목록 출력 -->
- <select id="commentListData" resultMap="com.sist.web.vo.CommentVO" parameterType="int">
+ <select id="commentListData" resultType="com.sist.web.vo.CommentVO" parameterType="int">
   SELECT no,fno,id,name,TO_CHAR(regdate,'yyyy-MM-dd hh24:mi:ss') as dbday
   FROM piniaComment
   WHERE fno=#{fno} <!--  맛집마다 따로 가져와야함 -->
