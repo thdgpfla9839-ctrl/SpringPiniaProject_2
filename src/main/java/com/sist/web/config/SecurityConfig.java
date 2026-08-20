@@ -118,14 +118,17 @@ public class SecurityConfig {
 	    .rememberMe(remember-> remember
 	         .key("my-secret-key")
 	         .rememberMeParameter("remember-me")
+	         // 저장기간을 1일로 설정
 	         .tokenValiditySeconds(60*60*24)
+	         // persistent_logins 테이블에 저장
 	         .tokenRepository(persistentTokenRepository())
 	    )
-	    
+	    // 로그아웃 실행
 	    .logout(logout -> logout 
 	          .logoutUrl("/member/logout")
 	          .logoutSuccessUrl("/")
 	          .invalidateHttpSession(true)
+	          // 쿠키를 삭제 
 	          .deleteCookies("remember-me","JSESSIONID")
 	    );
 	    // remember-me
@@ -169,7 +172,8 @@ public class SecurityConfig {
 	   return new BCryptPasswordEncoder();
    }
    
-// PersistentLogins 등록 => 자동로그인
+// PersistentLogins 등록 => 자동로그인 
+   // 이 부분이 있어야 자동로그인이 돼어 저장이 된다
    @Bean
    public PersistentTokenRepository persistentTokenRepository() {
        JdbcTokenRepositoryImpl repo = new JdbcTokenRepositoryImpl();
@@ -178,3 +182,71 @@ public class SecurityConfig {
    }
    
 }
+
+/*
+ *   최종 정리
+ *   [사용자] => post방식으로 액션을 날림 /meber/login_process에서 시작
+ *     |
+ *  SpringSecurity FilterChain을 거침
+ *   : 인증과정을 거침
+ *     |
+ *  UsernamePasswordAuthenticationFilter
+ *    : .usernameParameter / .passwordParameter
+ *     |
+ *  AuthenticationManager
+ *    : DB 검색
+ *     |
+ *  AuthenticationProvider
+ *     |
+ *  JdbcUserDetailManager  
+ *    : 1) springmember => 기본 사용자 정보 2)authority => 권한 정보
+ *         두 테이블에서 해당 정보를 가져온다
+ *         다만 username이 존재하는 상태에서 가능하다
+ *     |
+ *  UserDetails로 저 두 정보를 모아준다
+ *     |
+ *  BCryptPasswordEncoder
+ *   : 비밀번호 정보를 검증
+ *     |
+ *   비밀번호 
+ *  성공 / 실패  
+ *  두가지로 나뉜다
+ *  1) 성공 : LoginSuccessHandler - SecurityContext - Session에 저장 - 인증완료
+ *  2) 실패 : LoginFailHandler
+ *     
+ *          
+ */
+
+/*
+ *  [라이브러리 역할]
+ *  @EnableWebSecurity : Spring Security 활성화를 시키는 이유는 사용하기 위함이다
+ *  
+ *  [알아둬야 하는 클래스]
+ *  1. SecurityConfig : 보안 전체를 설계(설정)를 담당하는 부분 => 사용자 정의(개발자가 만들어야함)
+ *  2. HttpSecurity   : 주로 로그인이나 로그아웃, 권한, CSRF 보안 설정을 구성
+ *  3. SecurityFilterChain : HTTP 요청에 대한 Spring Security 필터 처리 순서 정의
+ *  4. AuthenticationManager : 사용자의 인증과정을 총괄
+ *  5. AuthenticationProvider : 실제 사용자 인증을 수행하는 객체 => login_ok
+ *  6. UserDetailsService    : 로그인한 사용자의 정보를 조회
+ *  7. JdbcUserDetailsManager : DB에서 사용자나 권한 정보를 조회해서 저장해주는 역할 => 반드시 SQL문장을 사용해야한다
+ *  8. UserDetails      :  사용자 정보가 저장된 객체
+ *  9. BCryptPasswordEncoder : 비밀번호 암호화를 처리하는 곳
+ *  10. JdbcTokenRepositoryImpl : 자동로그인 시 사용자 구분, 토큰을 저장하는 역할
+ *  11. LoginSuccessHandler : 로그인 성공 시 처리 => 개발자가 만든 부분
+ *  12. LoginFailHandler : 로그인 실패 시 처리되는 부분 => 역시 개발자가 만듦
+ *  13. SecurityContext : 인증 정보를 보관하는 클랫,
+ *  14. formLogin : 로그인 시 처리방법을 설정
+ *  15. rememberMe : 자동로그인 설정하는 부분
+ *  16. logout : 말그대로 로그아웃 => 세션해체, 쿠키삭제를 담당
+ *  
+ *  => Filter - Manager - UserDetailsService - DB - PasswordEncoder - Authentication - SecurityContext
+ *  => DB에는 회원, 권한 정보를 가지고 있음
+ *  => Authentication에는 로그인된 사용자 정보만 가지고 있음
+ *  => SecurityContext에는 Authentication에 저장돼 있는 정보를 보관
+ *  => Session은 로그인 상태 유지 => 세선에 저장하면 리멤버미가 가능 세션을 해체하기 전까지
+ *  
+ *  => 인증 - 성공 - 유지 부분만 잘 기억하면 됨
+ *  => 인증 : AuthenticationManager
+ *  => 성공 : Authentication - SecurityContext
+ *  => 유지 : Session (remember-me) => cookie + DB
+ */
