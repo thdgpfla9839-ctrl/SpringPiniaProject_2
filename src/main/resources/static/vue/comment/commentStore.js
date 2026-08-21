@@ -35,6 +35,7 @@ const useCommentStore=defineStore('comment',{
 		sessionId:'',
 		fno:0,
 		msg:''
+		
 	}),
 	getters:{
 		
@@ -63,10 +64,11 @@ const useCommentStore=defineStore('comment',{
 					msgRef?.focus() // ?의 의미
 					return 
 				}
-				const res=await api.post('/comment/insert_vue"',{
+				const res=await api.post('/comment/insert_vue',{
 					page:this.curpage,
 					fno:this.fno,
 					msg:this.msg
+				
 				})
 				console.log(res.data) 
 				this.rList=res.data.rList 
@@ -74,6 +76,9 @@ const useCommentStore=defineStore('comment',{
 				this.totalpage=res.data.totalpage
 				this.count=res.data.count
 				this.msg=''
-		}
+		},
+		/*toggleReply(no){
+			this.replyNo=this.replyNo===no?null:no
+		}*/
 	}
 })

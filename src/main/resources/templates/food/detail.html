@@ -171,8 +171,8 @@ console.log("ID="+SESSION_ID)
            <tbody>
             <tr>
              <td class="text-center">
-              <textarea rows="4" cols="70" style="float: left"></textarea>
-               <button type="button" class="btn-primary" style="width:100px;height: 89px;float: left">댓글</button>
+              <textarea rows="4" cols="70" style="float: left" ref="msgRef" v-model="store.msg"></textarea>
+               <button type="button" class="btn-primary" @click="store.commentInsert(msgRef)" style="width:100px;height: 89px;float: left">댓글</button>
              </td>
             </tr>
            </tbody>
