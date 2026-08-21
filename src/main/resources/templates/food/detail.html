@@ -6,8 +6,12 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
-<script>
-const NO=/*[[${no}]]*/ 0
+<script th:inline="javascript">
+const NO=/*[[${vo.no}]]*/ 0
+const SESSION_ID=/*[[${session.userid}]]*/ ''
+
+console.log("NO="+NO)
+console.log("ID="+SESSION_ID)
 </script>
 <style type="text/css">
 .row {
@@ -120,9 +124,89 @@ const NO=/*[[${no}]]*/ 0
         </tbody>
       </table>
     </div>
+    <script src="/vue/axios.js"></script>
+    <script src="/vue/comment/commentStore.js"></script>
     <div class="row" style="margin-top: 10px" id="commentId">
-      
+      <table class="table" v-if="store.count===0">
+       <tbody>
+        <tr>
+         <td class="text-center">
+          <h3>댓글이 없습니다</h3>
+         </td>
+        </tr>
+       </tbody>
+      </table>
+      <table class="table" v-if="store.count!==0">
+       <tbody>
+        <tr>
+         <td>
+          <table class="table" v-for="(rvo,index) in store.rList" :key="index">
+           <tbody>
+            <tr>
+             <td width="80%" class="text-left">
+              🔔{{rvo.name}}({{rvo.dbday}})
+             </td>
+             <td width="20%" class="text-right">
+              <a class="a-link btn btn-xs btn-info" v-if="rvo.id===store.sessionId">수정</a>
+              <a class="a-link btn btn-xs btn-warning" v-if="rvo.id===store.sessionId">삭제</a>
+             </td>
+            </tr>
+            <tr>
+             <td colspan="2" style="white-space: pre-wrap;">{{rvo.msg}}</td>
+            </tr>
+           </tbody>
+          </table>
+          <table class="table">
+           <tbody>
+            <tr>
+             <td class="text-center">
+              <button type="button" class="btn-sm btn-primary">이전</button>
+              {{store.curpage}} page / {{store.totalpage}} pages
+              <button type="button" class="btn-sm btn-primary">다음</button>
+             </td>
+            </tr>
+           </tbody>
+          </table>
+          <table class="table" sec:authorize="isAuthenticated()">
+           <tbody>
+            <tr>
+             <td class="text-center">
+              <textarea rows="4" cols="70" style="float: left"></textarea>
+               <button type="button" class="btn-primary" style="width:100px;height: 89px;float: left">댓글</button>
+             </td>
+            </tr>
+           </tbody>
+          </table>
+         </td>
+        </tr>
+       </tbody>
+      </table>
     </div>
   </div>
+  <script>
+   const {onMounted,ref,createApp}=Vue
+   const {createPinia}=Pinia
+   const commentApp=createApp({
+	   
+	   setup(){
+		   // 1. store를 가지고 온다
+		   const store=useCommentStore()
+		   // 2. ref
+		   const msgRef=ref(null)
+		   // 3. 시작과 동시에 => 데이터 읽기
+		   onMounted(()=>{
+			   store.sessionId=SESSION_ID
+			   store.commentListData(NO)
+		   })
+		   // 4. html에서 사용이 가능하게 변수 리턴
+		   return {
+			   store,
+			   msgRef
+		   }
+	   }
+   })
+   commentApp.use(createPinia())
+   commentApp.mount("#commentId")
+  </script>
 </body>
 </html>

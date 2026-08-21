@@ -70,7 +70,7 @@ public class CommentRestController {
 			 String name =(String)session.getAttribute("username");
 			 vo.setId(id);
 			 vo.setName(name); // 이거 두개는 세션에 저장돼 있어서 값을 안 보낼거야
-			 cService.commentInsert(vo); // 갱신되면 변경된 데이터 디비에 보내줘야해
+			 cService.commentInsert(vo); // 갱신되면 변경된 데이터 디비에 보내줘야해 => 왜먀면 실시간 댓글이라 새로고침을 해서 업데이트 시키는게 아니라서
 			 map = commonsData(vo.getPage(), vo.getFno()); 
 		  }
 		  catch (Exception ex) 

@@ -4,7 +4,7 @@
 
 <!--  목록 출력 -->
  <select id="commentListData" resultType="com.sist.web.vo.CommentVO" parameterType="int">
-  SELECT no,fno,id,name,TO_CHAR(regdate,'yyyy-MM-dd hh24:mi:ss') as dbday
+  SELECT no,fno,id,name,TO_CHAR(regdate,'yyyy-MM-dd hh24:mi:ss') as dbday,msg
   FROM piniaComment
   WHERE fno=#{fno} <!--  맛집마다 따로 가져와야함 -->
   ORDER BY no DESC
