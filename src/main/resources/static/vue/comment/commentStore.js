@@ -80,5 +80,11 @@ const useCommentStore=defineStore('comment',{
 		/*toggleReply(no){
 			this.replyNo=this.replyNo===no?null:no
 		}*/
+		// 댓글 삭제
+		async commentDelete(){
+			
+		}
+		
+		// 댓글 수정
 	}
 })

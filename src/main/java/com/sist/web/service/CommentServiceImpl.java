@@ -29,4 +29,10 @@ public class CommentServiceImpl implements CommentService{
 		// TODO Auto-generated method stub
 		mapper.commentInsert(vo);
 	}
+
+	@Override
+	public void commentDelete(int no) {
+		// TODO Auto-generated method stub
+		mapper.commentDelete(no);
+	}
 }

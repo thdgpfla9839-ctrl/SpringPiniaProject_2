@@ -19,4 +19,10 @@
  <insert id="commentInsert" parameterType="com.sist.web.vo.CommentVO">
   INSERT INTO piniaComment VALUES(pc_no_seq.nextval,#{fno},#{id},#{name},#{msg},SYSDATE)
  </insert>
+ 
+ <!-- 댓글 삭제 -->
+ <delete id="commentDelete" parameterType="int">
+  DELETE FROM piniaComment
+  WHERE no=#{no}
+ </delete>
 </mapper>

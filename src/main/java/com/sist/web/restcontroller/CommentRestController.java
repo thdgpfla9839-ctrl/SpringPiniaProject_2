@@ -2,6 +2,7 @@ package com.sist.web.restcontroller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -79,5 +80,24 @@ public class CommentRestController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		  }
 		  return ResponseEntity.ok(map);
+	}
+	
+	// 댓글 삭제
+	@DeleteMapping("/comment/delete_vue")
+	public ResponseEntity<Map> comment_delete(@RequestParam("no") int no, @RequestParam("page") int page, @RequestParam("fno") int fno)
+	{
+		Map map = new HashMap();
+		try 
+		  {
+			 cService.commentDelete(no);
+			 map=commonsData(page,fno);
+		  }
+		  catch (Exception ex) 
+		  {
+			ex.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		  }
+		
+		return ResponseEntity.ok(map);
 	}
 }

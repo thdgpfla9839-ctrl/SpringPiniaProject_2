@@ -35,5 +35,14 @@ public interface CommentMapper {
 				 </insert>
 	 */
 	public void commentInsert(CommentVO vo);
-	 
+
+	
+	// 댓글 삭제
+	/*
+	 *  <delete id="commentDelete" parameterType="int">
+		  DELETE FROM piniaComment
+		  WHERE no=#{no}
+		 </delete>
+	 */
+	public void commentDelete(int no);
 }
