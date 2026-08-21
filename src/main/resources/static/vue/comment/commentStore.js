@@ -34,7 +34,9 @@ const useCommentStore=defineStore('comment',{
 		count:0,
 		sessionId:'',
 		fno:0,
-		msg:''
+		msg:'',
+		upReplyNo:null,
+		updateMsg:{}
 		
 	}),
 	getters:{
@@ -77,14 +79,47 @@ const useCommentStore=defineStore('comment',{
 				this.count=res.data.count
 				this.msg=''
 		},
-		/*toggleReply(no){
-			this.replyNo=this.replyNo===no?null:no
-		}*/
+		// 댓글 수정
+		// 수정 댓글창 토글로
+		toggleUpdate(no,msg){
+			this.upReplyNo=this.upReplyNo===no?null:no
+			this.updateMsg[no]=msg
+		},
+		async commentUpdate(no){
+			const res=await api.put('/comment/update_vue',{
+				no:no,
+				fno:this.fno,
+				page:this.curpage,
+				msg:this.updateMsg[no]
+				
+			})
+			console.log(res.data) 
+			this.rList=res.data.rList 
+			this.curpage=res.data.curpage
+			this.totalpage=res.data.totalpage
+			this.count=res.data.count
+			this.upReplyNo=null
+		},
 		// 댓글 삭제
-		async commentDelete(){
-			
+		async commentDelete(no){
+			const res=await api.delete('/comment/delete_vue',{
+				     params:{
+								page:this.curpage,
+								fno:this.fno,
+								no:no
+							}
+							
+					})
+							console.log(res.data) 
+							this.rList=res.data.rList 
+							this.curpage=res.data.curpage
+							this.totalpage=res.data.totalpage
+							this.count=res.data.count
+		},
+		move(page){
+			this.curpage=page
+			this.commentListData(this.fno)
 		}
 		
-		// 댓글 수정
 	}
 })

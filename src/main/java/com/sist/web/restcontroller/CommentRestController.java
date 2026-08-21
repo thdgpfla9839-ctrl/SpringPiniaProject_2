@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -100,4 +101,24 @@ public class CommentRestController {
 		
 		return ResponseEntity.ok(map);
 	}
+	
+	// 댓글 수정
+	@PutMapping("/comment/update_vue")
+	public ResponseEntity<Map> comment_update(@RequestBody CommentVO vo)
+	{
+		Map map = new HashMap();
+		try 
+		  {
+			 cService.commentUpdate(vo);
+			 map=commonsData(vo.getPage(),vo.getFno());
+		  }
+		  catch (Exception ex) 
+		  {
+			ex.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		  }
+		
+		return ResponseEntity.ok(map);
+	}
+	
 }

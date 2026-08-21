@@ -18,6 +18,9 @@ console.log("ID="+SESSION_ID)
   width: 900px;
   margin: 0px auto;
 }
+.a-link{
+  cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -93,7 +96,6 @@ console.log("ID="+SESSION_ID)
 				// 주소-좌표 변환 객체를 생성합니다
 				var geocoder = new kakao.maps.services.Geocoder();
 				
-				
 				// 주소로 좌표를 검색합니다
 				geocoder.addressSearch('[[${vo.address}]]', function(result, status) {
 				
@@ -128,78 +130,99 @@ console.log("ID="+SESSION_ID)
     <script src="/vue/comment/commentStore.js"></script>
     <div class="row" style="margin-top: 10px" id="commentId">
       <table class="table" v-if="store.count===0">
-       <tbody>
-        <tr>
-         <td class="text-center">
-          <h3>댓글이 없습니다</h3>
-         </td>
-        </tr>
-       </tbody>
+        <tbody>
+          <tr>
+            <td class="text-center">
+             <h3>댓글이 없습니다</h3>
+            </td>
+          </tr>
+        </tbody>
       </table>
-      <table class="table" v-if="store.count!==0">
-       <tbody>
-        <tr>
-         <td>
-          <table class="table" v-for="(rvo,index) in store.rList" :key="index">
-           <tbody>
-            <tr>
-             <td width="80%" class="text-left">
-              🔔{{rvo.name}}({{rvo.dbday}})
-             </td>
-             <td width="20%" class="text-right">
-              <a class="a-link btn btn-xs btn-info" v-if="rvo.id===store.sessionId">수정</a>
-              <a class="a-link btn btn-xs btn-warning" v-if="rvo.id===store.sessionId">삭제</a>
-             </td>
-            </tr>
-            <tr>
-             <td colspan="2" style="white-space: pre-wrap;">{{rvo.msg}}</td>
-            </tr>
-           </tbody>
-          </table>
-          <table class="table">
-           <tbody>
-            <tr>
-             <td class="text-center">
-              <button type="button" class="btn-sm btn-primary">이전</button>
-              {{store.curpage}} page / {{store.totalpage}} pages
-              <button type="button" class="btn-sm btn-primary">다음</button>
-             </td>
-            </tr>
-           </tbody>
-          </table>
-         
-         </td>
-        </tr>
-       </tbody>
+      <table class="table" v-if="store.count>0">
+        <tbody>
+          <tr>
+            <td>
+             <table class="table" v-for="(rvo,index) in store.rList" :key="index">
+               <tbody>
+                 <tr>
+                   <td width=80% class="text-left">
+                    🔔{{rvo.name}}({{rvo.dbday}})
+                   </td>
+                   <td width=20% class="text-right">
+                    <a class="a-link btn btn-xs btn-info" v-if="rvo.id===store.sessionId"
+                      @click="store.toggleUpdate(rvo.no,rvo.msg)"
+                    >{{store.upReplyNo===rvo.no?'취소':'수정'}}</a>
+                    <a class="a-link btn btn-xs btn-warning" v-if="rvo.id===store.sessionId"
+                      @click="store.commentDelete(rvo.no)"
+                    >삭제</a>
+                   </td>
+                 </tr>
+                 <tr>
+                   <td colspan="2" style="white-space: pre-wrap;">
+                     {{rvo.msg}}
+                   </td>
+                 </tr>
+                 <tr v-if="store.upReplyNo===rvo.no">
+                   <td colspan="2">
+                     <textarea rows="4" cols="70" style="float: left"
+	                   v-model="store.updateMsg[rvo.no]"
+	                  ></textarea>
+	                  <button type=button class="btn-primary"
+	                    @click="store.commentUpdate(rvo.no)"
+	                    style="width:100px;height: 89px;float: left">
+	                    수정
+	                  </button>
+	               </td>
+                 </tr>
+               </tbody>
+             </table>
+             <table class="table">
+               <tbody>
+                 <tr>
+                   <td class="text-center">
+                    <button type=button class="btn-sm btn-primary" @click="store.move(store.curpage-1)" v-if="store.curpage>1">이전</button>
+                    {{store.curpage}} page / {{store.totalpage}} pages
+                    <button type=button class="btn-sm btn-primary" @click="store.move(store.curpage+1)" v-if="store.curpage<store.totalpage">다음</button>
+                   </td>
+                 </tr>
+               </tbody>
+             </table>
+             
+            </td>
+          </tr>
+        </tbody>
       </table>
       <table class="table" sec:authorize="isAuthenticated()">
-           <tbody>
-            <tr>
-             <td class="text-center">
-              <textarea rows="4" cols="70" style="float: left" ref="msgRef" v-model="store.msg"></textarea>
-               <button type="button" class="btn-primary" @click="store.commentInsert(msgRef)" style="width:100px;height: 89px;float: left">댓글</button>
-             </td>
-            </tr>
-           </tbody>
-          </table>
+               <tbody>
+                <tr>
+                 <td class="text-center">
+                  <textarea rows="4" cols="70" style="float: left"
+                   ref="msgRef" v-model="store.msg"
+                  ></textarea>
+                  <button type=button class="btn-primary"
+                    @click="store.commentInsert(msgRef)"
+                    style="width:100px;height: 89px;float: left">댓글</button>
+                 </td>
+                </tr>
+               </tbody>
+             </table>
     </div>
   </div>
   <script>
-   const {onMounted,ref,createApp}=Vue
-   const {createPinia}=Pinia
+   const {onMounted,ref,createApp} = Vue
+   const {createPinia} = Pinia 
    const commentApp=createApp({
-	   
 	   setup(){
-		   // 1. store를 가지고 온다
+		   //1. store를 가지고 온다 
 		   const store=useCommentStore()
-		   // 2. ref
+		   //2. ref 
 		   const msgRef=ref(null)
-		   // 3. 시작과 동시에 => 데이터 읽기
+		   //3. 시작과 동시에 => 데이터 읽기 
 		   onMounted(()=>{
 			   store.sessionId=SESSION_ID
 			   store.commentListData(NO)
 		   })
-		   // 4. html에서 사용이 가능하게 변수 리턴
+		   //4. HTML에서 사용이 가능 하게 => 변수 리턴 
 		   return {
 			   store,
 			   msgRef

@@ -10,4 +10,5 @@ public interface CommentService {
 	public int commentRowCount(int fno);
 	public void commentInsert(CommentVO vo);
 	public void commentDelete(int no);
+	public void commentUpdate(CommentVO vo);
 }

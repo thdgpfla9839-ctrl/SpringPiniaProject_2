@@ -25,4 +25,11 @@
   DELETE FROM piniaComment
   WHERE no=#{no}
  </delete>
+ 
+ <!-- 댓글 수정 -->
+ <update id="commentUpdate" parameterType="com.sist.web.vo.CommentVO">
+  UPDATE piniaComment SET
+  msg=#{msg}
+  WHERE no=#{no}
+ </update>
 </mapper>
