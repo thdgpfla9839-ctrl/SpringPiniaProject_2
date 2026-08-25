@@ -37,7 +37,7 @@
     <ul class="nav navbar-nav navbar-right">
       <li sec:authorize="!isAuthenticated()"><a href="#"><span class="glyphicon glyphicon-user"></span> 회원가입</a></li>
       <li sec:authorize="!isAuthenticated()"><a href="/member/login"><span class="glyphicon glyphicon-log-in"></span> 로그인</a></li>
-      <li sec:authorize="isAuthenticated()">
+      <li sec:authorize="isAuthenticated()"> <!-- 로그인 여부 확인하는 과정 -->
       <li sec:authorize="hasRole('ADMIN')">
         <a href="#">
             <span th:text="${session.username}"></span>(관리자) 로그인되었습니다
