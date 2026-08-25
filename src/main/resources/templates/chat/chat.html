@@ -242,35 +242,44 @@
 <script src="/vue/chat/chatStore.js"></script>
 
 <script>
-
+    // 피니아 라이브러리 생성
     const { createPinia } = Pinia
 
+    // vue 라이브러리 생성 => 이게 바로 CDN 방식
     const {
         ref,
         createApp,
         onMounted
-    } = Vue
+    } = Vue 
 
     const app = createApp({
 
+    	// setup() => 한번에 모아서 소스코딩
         setup() {
 
+    		// store 안에는 piniaStore와 관련된 모든게 저장돼 있음
             const store = useChatStore()
 
+            // 스크롤바, 화면 (전체 => 1:1)
             const chatBody = ref(null)
 
+            // onMounted => onload와 똑같아 => 화면이 생성이된 다음 실행해라
             onMounted(() => {
 
+            	// 로그인한 사람의 아이디를 얻어오는 과정
                 store.loginUser =
                     LOGIN_USER
 
+                // 채팅창 UI와 관련
                 store.chatBodyEl =
                     chatBody.value
 
+                // 웹소캣과 연결되는 부분
                 store.connect()
 
             })
 
+            // return => html에서 사용이 가능하게하기 위해 해준다
             return {
 
                 store,
@@ -283,8 +292,10 @@
 
     })
 
+    // 피니아 등록하는 부분
     app.use(createPinia())
 
+    // mount => 제어하는 html 영역 => 이 부분이 <template>에 해당된다
     app.mount('#app')
 
 </script>
