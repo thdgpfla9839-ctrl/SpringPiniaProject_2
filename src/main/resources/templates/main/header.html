@@ -31,8 +31,8 @@
           <li><a href="#">쉐프</a></li>
         </ul>
       </li>
-      <li><a href="#">실시간 채팅</a></li>
-      <li><a href="#">빠른 예약</a></li>
+      <li sec:authorize="isAuthenticated()"><a href="/chat/chat">실시간 채팅</a></li>
+      <li sec:authorize="isAuthenticated()"><a href="#">빠른 예약</a></li>
     </ul>
     <ul class="nav navbar-nav navbar-right">
       <li sec:authorize="!isAuthenticated()"><a href="#"><span class="glyphicon glyphicon-user"></span> 회원가입</a></li>
@@ -50,7 +50,7 @@
       </li>
       <li sec:authorize="hasRole('MANAGER')">
         <a href="#">
-            <span th:text="${session.username}"></span>(매니저) 로그인되었습니다
+            <span th:text="${session.username}"></span>(부관리자) 로그인되었습니다
         </a>
       </li>
       <li sec:authorize="isAuthenticated()">
