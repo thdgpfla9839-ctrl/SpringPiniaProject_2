@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet"
+href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<style type="text/css">
+.row{
+width: 800px;
+margin: 0px auto;
+}
+h3 {
+	text-align: center;
+}
+</style>          
+</head>
+<body>
+ <div class="container">
+  <div class="row">
+   <h3>자유 게시판</h3>
+    <table class="table">
+     <tbody>
+      <tr>
+       <td>
+        <a href="/board/insert" class="btn btn-sm btn-danger">새글</a> <!-- 일반 변수 링크 거는 방식 -->
+       </td>
+      </tr>
+     </tbody>
+     <thead>
+      <tr class="success">
+       <th class="text-center" width="10%">번호</th>
+       <th class="text-center" width="45%">제목</th>
+       <th class="text-center" width="15%">이름</th>
+       <th class="text-center" width="20%">작성일</th>
+       <th class="text-center" width="10%">조회수</th>
+      </tr>
+     </thead>
+      <tbody>
+      <!-- 타임리프 출력방식 -->
+       <tr th:each="vo:${list}">
+	       <th class="text-center" width="10%">[[${vo.no}]]</th>
+	       <th width="45%"><a th:href="@{/board/detail(no=${vo.no})}">[[${vo.subject}]]</a></th>
+	       <th class="text-center" width="15%">[[${vo.name}]]</th>
+	       <th class="text-center" width="20%">[[${#temporals.format(vo.regdate,'yyyy-MM-dd')}]]</th> <!-- 타임리프에서는 지금처럼 출력해야 우리가 매번 쓰는 날짜형식으로 출력됨 -->
+	       <th class="text-center" width="10%">[[${vo.hit}]]</th>
+      </tr>
+       <tr>
+        <td colspan="5" class="text-center">
+         <a th:href="@{/board/list(page=${curpage>1?curpage-1:curpage})}" class="btn btn-sm btn-primary">이전</a>
+          <span th:text="${curpage}"></span> page /
+           <span th:text="${totalpage}"></span> pages
+         <a th:href="@{/board/list(page=${curpage<totalpage?curpage+1:curpage})}" class="btn btn-sm btn-primary">다음</a> 
+        </td>
+       </tr>
+      </tbody>
+    </table>
+  </div>
+ </div>
+</body>
+</html>

@@ -139,7 +139,17 @@ const useChatStore = defineStore('chat', {
                                 )
                         }
                     )
-					// 목록을 보내달라 요청
+					// 목록을 보내달라 요청 => @MessageMapping()
+					/* @MessageMapping()
+					   => 클라이언트가 서버로 보내는 메시지 처리
+					   
+					   SimpleMessageTemplate
+					   => 서버가 클라이언트에게 메시지 전송
+					   
+					   WebSocket
+					   => 채팅 / 알림 / 실시간 상태 변경
+					   => 요즘엔 챗봇이 생기면서 사라지고 있는 상황
+					*/
 					this.stomp.send(
 						'/app/chat/join',{},
 						JSON.stringify({})

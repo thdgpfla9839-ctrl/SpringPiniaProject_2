@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<style type="text/css">
+ .row{
+ width: 800px;
+  margin: 0px auto;
+ }
+ h3 {
+	text-align: center;
+}
+</style>
+</head>
+<body>
+ <div class="container">
+  <div class="row">
+   <h3>내용보기</h3>
+    <table class="table">
+     <tbody>
+      <tr>
+       <th width="20%" class="text-center success">번호</th>
+        <td width="30%" class="text-center">[[${vo.no}]]</td>
+       <th width="20%" class="text-center success">작성일</th>
+        <td width="30%" class="text-center">[[${#temporals.format(vo.regdate,'yyyy-MM-dd hh:mm:ss')}]]</td>
+      </tr>
+      <tr>
+       <th width="20%" class="text-center success">이름</th>
+        <td width="30%" class="text-center">[[${vo.name}]]</td>
+       <th width="20%" class="text-center success">조회수</th>
+        <td width="30%" class="text-center">[[${vo.hit}]]</td>
+      </tr>
+      <tr>
+       <th width="20%" class="text-center success">제목</th>
+        <td colspan="3" class="text-center">[[${vo.subject}]]</td>
+      </tr>
+       <tr>
+        <td colspan="4" class="text-left" valign="top" height="200">
+         <pre style="white-space: pre-wrap;border: none;background: white;">[[${vo.content}]]</pre>
+        </td>
+       </tr>
+        <tr>
+         <td colspan="4" class="text-right">
+          <a href="#" class="btn btn-xs btn-info">수정</a>
+          <a href="#" class="btn btn-xs btn-success">삭제</a>
+          <a href="/board/list" class="btn btn-xs btn-warning">목록</a>
+         </td>
+        </tr>
+     </tbody>
+    </table>
+  </div>
+ </div>
+  <div class="row" style="margin-top: 20px;">
+   <h3>댓글</h3>
+     <table class="table" sec:authorize="isAuthenticated()">
+               <tbody>
+                <tr>
+                 <td class="text-center">
+                  <textarea rows="4" cols="70" style="float: left"></textarea>
+                  <button type=button class="btn-primary" style="width:100px;height: 89px;float: left">댓글</button>
+                 </td>
+                </tr>
+               </tbody>
+     </table>
+  </div>
+</body>
+</html>

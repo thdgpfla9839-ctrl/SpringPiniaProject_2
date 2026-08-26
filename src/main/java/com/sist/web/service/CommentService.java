@@ -1,5 +1,5 @@
 package com.sist.web.service;
-
+// 레시피 상세보기 속 댓글
 import java.util.List;
 
 import com.sist.web.vo.CommentVO;
