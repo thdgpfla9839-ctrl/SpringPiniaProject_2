@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.sist.web.entity.BootBoard;
 import com.sist.web.service.BoardServiceImpl;
+
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -76,6 +78,8 @@ public class BoardController {
 		vo.setHit(vo.getHit()+1);
 		bDao.save(vo);
 		vo = bDao.findByNo(no);
+		
+		model.addAttribute("no",no);
 		model.addAttribute("vo",vo);
 		model.addAttribute("main_html","board/detail");
 		return "main/main";

@@ -16,6 +16,10 @@
 	text-align: center;
 }
 </style>
+<script>
+const SESSION_ID=/*[[${session.userid}]]*/''
+const BOARDNO=/*[[${no}]]*/0
+</script>
 </head>
 <body>
  <div class="container">
@@ -55,18 +59,39 @@
     </table>
   </div>
  </div>
-  <div class="row" style="margin-top: 20px;">
+  <div class="row" style="margin-top: 20px;" id="comment">
    <h3>댓글</h3>
+    <table class="table" v-if="store.count==0">
+     <tbody>
+      <tr>
+       <td class="text-center">
+        <h3>댓글이 없습니다</h3>
+       </td>
+      </tr>
+     </tbody>
+    </table>
+    <table class="table" v-else>
+     <tbody>
+      <tr>
+       <td class="text-center">
+        <h3>댓글이 있습니다</h3>
+       </td>
+      </tr>
+     </tbody>
+    </table>
      <table class="table" sec:authorize="isAuthenticated()">
                <tbody>
                 <tr>
                  <td class="text-center">
-                  <textarea rows="4" cols="70" style="float: left"></textarea>
+                  <textarea rows="4" cols="70" style="float: left" ref="msgRef" v-model="store.msg"></textarea>
                   <button type=button class="btn-primary" style="width:100px;height: 89px;float: left">댓글</button>
                  </td>
                 </tr>
                </tbody>
-     </table>
+     </table>  
   </div>
+  <script src="/vue/axios.js"></script>
+  <script src="/vue/comment/boardStore.js"></script>
+  <script src="/vue/comment/boardView.js"></script>
 </body>
 </html>

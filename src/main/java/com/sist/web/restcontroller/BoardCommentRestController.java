@@ -1,0 +1,81 @@
+package com.sist.web.restcontroller;
+// vue와 연결 => 여기서 대댓글이 올라가면 아이디가 같은게 들어오면 알림 날려줌
+import java.util.*;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.sist.web.vo.*;
+
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
+
+import com.sist.web.mapper.*;
+@RestController
+@RequiredArgsConstructor
+public class BoardCommentRestController {
+
+	private final BoardCommentMapper bMapper;
+	
+	public Map commonListData(int page,int board_no)
+	{
+		Map map = new HashMap();
+		int start = (page*10)-10;
+		map.put("start", start);
+		map.put("board_no", board_no);
+		
+		List<BootCommentVO> list = bMapper.boardCommentListData(map);
+		int count = bMapper.boardCommentCount(board_no);
+		int totalpage = (int)(Math.ceil(count/10.0));
+		
+		map = new HashMap();
+		map.put("list", list);
+		map.put("curpage", page);
+		map.put("totalpage", totalpage);
+		map.put("count", count);
+
+		return map;
+	}
+	@Async
+	@GetMapping("/reply/list_vue")
+	public ResponseEntity<Map> board_list(@RequestParam("board_no") int board_no, @RequestParam("page") int page)
+	{
+		Map map = new HashMap();
+		try 
+		{
+			map = commonListData(page, board_no);
+		} 
+		catch (Exception ex) 
+		{
+			// 예전에는 return new ResponseEntity<> (null,HttpStatus.INTERNAL_SERVER_ERROR); 이렇게 작성했어
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+		return ResponseEntity.ok(map);
+	}
+	
+	@Async
+	@PostMapping("/reply/insert_vue")
+	public ResponseEntity<Map> reply_insert(@RequestBody BootCommentVO vo, HttpSession session)
+	{
+		Map map = new HashMap();
+		try {
+			String id = (String)session.getAttribute("userid");
+			String name = (String)session.getAttribute("username");
+			vo.setId(id);
+			vo.setName(name);
+			
+			bMapper.boardCommentInsert(vo);
+			map = commonListData(vo.getPage(), vo.getBoard_no());
+			
+		} catch (Exception ex) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+		return ResponseEntity.ok(map);
+	}
+}
