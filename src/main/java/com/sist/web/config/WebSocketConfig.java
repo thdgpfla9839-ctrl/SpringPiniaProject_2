@@ -15,13 +15,14 @@ public class WebSocketConfig
     public void configureMessageBroker(
             MessageBrokerRegistry registry) {
 
-    	// topic : 전체 메시지를 날릴 때
-    	// queue : 개인 메시지를 날릴 때
+    	// topic : 전체 메시지를 날릴 때 => 전체채팅
+    	// queue : 개인 메시지를 날릴 때 => 1:1 채팅
     	// 이 형태는 내맘대로 바꿀 수 있음 topic => all 이런식으로
         registry.enableSimpleBroker(
                 "/topic",
                 "/queue",
                 "/sub" // 이게 들어가면 알림을 나타낸다 => 댓글 달리면 알림
+                // sub => 1:1 채팅과 비슷해 해당 댓글 작성자한테만 알림이 가는 방식이야
         );
 
         // 클라이언트에서 서버를 요청을 할 때
@@ -34,6 +35,9 @@ public class WebSocketConfig
         );
 
         // /user/queue/chat
+        // setUserDestinationPrefix
+        // => 스프링 Security의 로그인 세션(pricipal)을 이용해서
+        //    서버가 해당 세션은 kim/shin..인지 자동으로 찾아서 보내주는 방식
         registry.setUserDestinationPrefix(
                 "/user"
         );

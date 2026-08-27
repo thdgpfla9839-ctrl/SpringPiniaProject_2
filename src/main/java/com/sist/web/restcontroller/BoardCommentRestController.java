@@ -83,7 +83,7 @@ public class BoardCommentRestController {
 		return ResponseEntity.ok(map);
 	}
 	
-	// 대댓글
+	// 대댓글 저장 -> 알림 보내기
 	@PostMapping("/reply/rereply_insert_vue")
 	public ResponseEntity<Map> rereply_insert(@RequestBody BootCommentVO vo, HttpSession session)
 	{
@@ -106,6 +106,8 @@ public class BoardCommentRestController {
 			// pvo.getId() 여기에서 알림이 뜬다
 			if(!pvo.getId().equals(vo.getId()))
 			{
+				// template.convertAndSend를 실행 시
+				// => /sub/notice/"+pvo.getId()해당 주소로 메시지를 보내라고 브로커한테 요청
 				template.convertAndSend("/sub/notice/"+pvo.getId(),
 				"[🔔댓글 알림🔔]"+vo.getId()+"님이 댓글을 달았습니다.");
 			}

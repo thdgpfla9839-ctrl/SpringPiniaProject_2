@@ -27,11 +27,26 @@ const useBoardStore=defineStore('board_comment',{
 			const sock=new SockJS("/chat-ws")
 			this.stomp=Stomp.over(sock)
 			this.stomp.connect({},()=>{
+				// /sub/notice/'+id라는 주소로 오는 메시지를 받아보고 싶다고 
+				// enableSimpleBroker 해당 브로커한테 등록해둠
+				// /sub/notice/ => 이 경로 뒤에 /user가 없으니 웹소캣config에서 setUserDestinationPrefix 이게 작동한 것은 아니구나도 알 수 있음
+		        // /user로 받으려면 => convertAndSendToUser로 컨트롤러에서 보냈어야함 => /user가 붙으면 브로커가 특정 유저 전용이구나라고 판단 
+				// 그래서 서버가 시큐리티 로그인 정보랑 현재 로그인한 사람의 정보를 대조해서 
+				// 실제로 로그인되어 있는 kim의 세션(principal)을 찾아서 보내 => 그럼 브로커카 이 세션이 진짜 로그인한 kim이 맞는지 검증한 뒤 알림을 전달하는 복잡한 과정이야
+				// BUT, 지금처럼 사용해주면 그냥 주소 문자열 일치로 문자열만 알면 누구나 연결이 가능한 방식을 사용함
 				this.stomp.subscribe('/sub/notice/'+id,msg=>{
 					this.showToast(msg.body)
 					this.boardCommentListData(this.board_no)
 				})
 			})
+		},
+		disConnection(){
+			if(this.stomp && this.stomp.connected)
+				{
+					this.stomp.disconnect(()=>{
+						console.log("STOMP 종료")
+					})
+				}
 		},
 		setCommentData(res)
 		{
@@ -53,6 +68,7 @@ const useBoardStore=defineStore('board_comment',{
 			this.setCommentData(res)
 		},
 		async boardCommentInsert(msgRef){
+			
 			if(this.msg==='')
 				{
 					msgRef?.focus()
