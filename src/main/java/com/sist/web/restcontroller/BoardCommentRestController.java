@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,7 @@ import com.sist.web.mapper.*;
 public class BoardCommentRestController {
 
 	private final BoardCommentMapper bMapper;
+	private final SimpMessagingTemplate template;
 	
 	public Map commonListData(int page,int board_no)
 	{
@@ -53,6 +55,7 @@ public class BoardCommentRestController {
 		} 
 		catch (Exception ex) 
 		{
+			ex.printStackTrace(); 
 			// 예전에는 return new ResponseEntity<> (null,HttpStatus.INTERNAL_SERVER_ERROR); 이렇게 작성했어
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
@@ -74,8 +77,46 @@ public class BoardCommentRestController {
 			map = commonListData(vo.getPage(), vo.getBoard_no());
 			
 		} catch (Exception ex) {
+			ex.printStackTrace(); 
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 		return ResponseEntity.ok(map);
+	}
+	
+	// 대댓글
+	@PostMapping("/reply/rereply_insert_vue")
+	public ResponseEntity<Map> rereply_insert(@RequestBody BootCommentVO vo, HttpSession session)
+	{
+		Map map = new HashMap();
+		try {
+			// 상위 댓글의 정보를 가져온다
+			BootCommentVO pvo = bMapper.boardParentInfoData(vo.getNo());
+			bMapper.boardGroupStepIncrement(pvo.getGroup_id(), pvo.getGroup_step());
+			vo.setGroup_id(pvo.getGroup_id());
+			vo.setGroup_step(pvo.getGroup_step()+1);
+			vo.setGroup_tab(pvo.getGroup_tab()+1);
+			vo.setRoot(vo.getNo());
+			vo.setId((String)session.getAttribute("userid"));
+			vo.setName((String)session.getAttribute("username"));
+			bMapper.boardCommentReReply(vo);
+			bMapper.boardDepthIncrement(vo.getNo()); // 대댓글 인서트 끝
+			
+			// 대댓글 알림
+			// 내 댓글에 내가 또 댓글을 단거 말고
+			// pvo.getId() 여기에서 알림이 뜬다
+			if(!pvo.getId().equals(vo.getId()))
+			{
+				template.convertAndSend("/sub/notice/"+pvo.getId(),
+				"[🔔댓글 알림🔔]"+vo.getId()+"님이 댓글을 달았습니다.");
+			}
+			
+			map = commonListData(vo.getPage(), vo.getBoard_no());
+			
+		} catch (Exception ex) {
+			ex.printStackTrace(); 
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+		return ResponseEntity.ok(map);
+		
 	}
 }

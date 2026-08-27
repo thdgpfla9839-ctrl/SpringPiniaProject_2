@@ -64,9 +64,12 @@ public class BoardController {
 	
 	@PostMapping("/board/insert_ok")
 	// 보낼값은 없고 가져오기만 하면 됨
+	// @ModelAttribute("vo") BootBoard vo => vo를 매개변수(=파라미터=메소드가 실행될 때 외부에서 받는 값을 담는 변수)
 	public String board_insert_ok(@ModelAttribute("vo") BootBoard vo)
 	{
-		bDao.save(vo);
+		// @ModelAttribute("vo") 이걸 주는 순간 해당 데이터들의 값이 채워져
+		// vo에 값을 채웠다고 자동으로 디비에 저장되는게 아니야
+		bDao.save(vo); // 채워진 vo를 Service한테 대신 부탁
 		return "redirect:/board/list";
 	}
 	

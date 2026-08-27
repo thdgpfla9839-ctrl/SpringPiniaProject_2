@@ -18,10 +18,21 @@ const useBoardStore=defineStore('board_comment',{
 		updateMsg:{},
 		updateReplyNo:null,
 		replyMsg:{},
-		replyNo:null
+		replyNo:null,
+		stomp:null
 		
 	}),
 	actions:{
+		connect(id){
+			const sock=new SockJS("/chat-ws")
+			this.stomp=Stomp.over(sock)
+			this.stomp.connect({},()=>{
+				this.stomp.subscribe('/sub/notice/'+id,msg=>{
+					this.showToast(msg.body)
+					this.boardCommentListData(this.board_no)
+				})
+			})
+		},
 		setCommentData(res)
 		{
 			console.log(res.data)
@@ -39,7 +50,7 @@ const useBoardStore=defineStore('board_comment',{
 				}
 				
 			})
-			setCommentData(res)
+			this.setCommentData(res)
 		},
 		async boardCommentInsert(msgRef){
 			if(this.msg==='')
@@ -54,8 +65,37 @@ const useBoardStore=defineStore('board_comment',{
 					board_no:this.board_no,
 					msg:this.msg
 				})
-				setCommentData(res)
+				this.setCommentData(res)
+				this.msg=''
+		},
+		toggleReply(no){
+			this.replyNo=this.replyNo==no?null:no
 			
+		},
+		async boardCommentReplyInsert(no){
+			const res =await api.post('/reply/rereply_insert_vue',{
+				no:no,
+				board_no:this.board_no,
+				page:this.curpage,
+				msg:this.replyMsg[no]
+			})
+			this.setCommentData(res)
+			this.replyNo=null
+			this.replyMsg[no]=''
+		},
+		showToast(message){
+			const toast=document.getElementById("replyToast");
+			const toastMsg=document.getElementById("toastMsg");
+			toastMsg.innerText=message
+			toast.classList.add("show")
+			
+			setTimeout(()=>{
+				hideToast()
+			},5000)
 		}
 	}
 })
+function hideToast(){
+	const toast=document.getElementById("replyToast");
+	toast.classList.remove("show")
+}

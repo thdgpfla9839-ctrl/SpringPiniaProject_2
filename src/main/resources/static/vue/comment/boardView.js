@@ -10,6 +10,7 @@ const {createApp,onMounted,ref}=Vue
 	   onMounted(()=>{
 		  store.sessionId=SESSION_ID
 	      store.boardCommentListData(BOARDNO)
+		  store.connect(SESSION_ID)
 	   })
 	   
 	   return {
