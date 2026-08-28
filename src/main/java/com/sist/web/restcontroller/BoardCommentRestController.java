@@ -17,6 +17,7 @@ import com.sist.web.vo.*;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
+import com.sist.web.kafka.NoticeProducer;
 import com.sist.web.mapper.*;
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class BoardCommentRestController {
 
 	private final BoardCommentMapper bMapper;
 	private final SimpMessagingTemplate template;
+	private final NoticeProducer noticeProducer;
 	
 	public Map commonListData(int page,int board_no)
 	{
@@ -96,6 +98,7 @@ public class BoardCommentRestController {
 			vo.setGroup_step(pvo.getGroup_step()+1);
 			vo.setGroup_tab(pvo.getGroup_tab()+1);
 			vo.setRoot(vo.getNo());
+			// 본인 => vo.setId
 			vo.setId((String)session.getAttribute("userid"));
 			vo.setName((String)session.getAttribute("username"));
 			bMapper.boardCommentReReply(vo);
@@ -108,8 +111,19 @@ public class BoardCommentRestController {
 			{
 				// template.convertAndSend를 실행 시
 				// => /sub/notice/"+pvo.getId()해당 주소로 메시지를 보내라고 브로커한테 요청
-				template.convertAndSend("/sub/notice/"+pvo.getId(),
-				"[🔔댓글 알림🔔]"+vo.getId()+"님이 댓글을 달았습니다.");
+				
+				// 카프카 이용하면 밑에 코드가 필요없어짐
+				//template.convertAndSend("/sub/notice/"+pvo.getId(),
+				// "[🔔댓글 알림🔔]"+vo.getId()+"님이 댓글을 달았습니다.");
+				
+				// chatMessage 속 내용이 여기 controller에서 채워진다(뭘 보낼지, 누구한테 보낼지에 대한 내용)
+                ChatMessage notice = new ChatMessage(
+                      vo.getId(), // sender
+                      pvo.getId(), // receiver
+                      "[🔔댓글 알림🔔]"+vo.getId()+"님이 댓글을 달았습니다."
+                );		
+                noticeProducer.sendNotice(notice);
+				
 			}
 			
 			map = commonListData(vo.getPage(), vo.getBoard_no());

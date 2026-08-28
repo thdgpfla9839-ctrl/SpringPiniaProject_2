@@ -34,7 +34,8 @@ const useBoardStore=defineStore('board_comment',{
 				// 그래서 서버가 시큐리티 로그인 정보랑 현재 로그인한 사람의 정보를 대조해서 
 				// 실제로 로그인되어 있는 kim의 세션(principal)을 찾아서 보내 => 그럼 브로커카 이 세션이 진짜 로그인한 kim이 맞는지 검증한 뒤 알림을 전달하는 복잡한 과정이야
 				// BUT, 지금처럼 사용해주면 그냥 주소 문자열 일치로 문자열만 알면 누구나 연결이 가능한 방식을 사용함
-				this.stomp.subscribe('/sub/notice/'+id,msg=>{
+				// subscribe 구독하는 부분이 값을 받는 곳
+				this.stomp.subscribe('/sub/notice/'+id,msg=>{ // id:본인 아이디 -> sender
 					this.showToast(msg.body)
 					this.boardCommentListData(this.board_no)
 				})

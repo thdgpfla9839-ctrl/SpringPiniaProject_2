@@ -1,40 +1,59 @@
 #port => default : 8080 이지만 => 9090로 변경
-#nginx => 80 포트 
+#nginx => 80 포트
 #Jenkins => 8080
 # 다른 프로그램과 포트번호가 충돌되면 안 돼
 
 server:
- port: 9090
- servlet:
-  context-path: /
+  port: 9090
+  servlet:
+    context-path: /
 spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    # Kafka로 메시지 보내는 Producer 설정
+    producer:
+    # Key를 String 형태로 변환
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    # ChatMessage => 객체를 JSON 형태로 변환 후 => Kafka로 전송
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    # 메시지를 읽는 Consumer 클래스 생성
+    consumer:
+      group-id: notification-group
+    # 저장된 데이터가(offset) 없으면 가장 오래된 것 부터 출력
+      auto-offset-reset: earliest
+    # Key를 String 형태로 변환
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    # JSON 변경
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.sist.web.vo
+    # Listener => JSON을 역직렬화 시켜주는 역할 (serialize)
+    listener:
+      ack-mode: record
   datasource:
-    url: ${DB_URL} 
-    username: ${DB_USERNAME} 
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: oracle.jdbc.driver.OracleDriver
   jpa:
     database: oracle
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.OracleDialect 
+        dialect: org.hibernate.dialect.OracleDialect
         format_sql: true
-        user_sql_comments: true   
+        user_sql_comments: true
   thymeleaf:
     cache: false
     encoding: UTF-8
     prefix: classpath:templates/
     suffix: .html
     mode: HTML
-# mybatis 
+# mybatis
 mybatis:
   type-aliases-package: com.sist.web.vo
   mapper-locations: mybatis/mapper/*.xml
-# logging 
+# logging
 logging:
   level:
     org.hibernate.SQL: DEBUG
-    org.hibernate.orm.jdbc.bind: TRACE 
-# security 
-# spring ai 
-# websocket = 카프카   
+    org.hibernate.orm.jdbc.bind: TRACE
